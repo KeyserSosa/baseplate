@@ -45,55 +45,9 @@ import time
 from baseplate._utils import warn_deprecated
 from baseplate.secrets import VersionedSecret
 
-
-if hasattr(hmac, "compare_digest"):
-    # This was added in Python 2.7.7 and 3.3
-    # pylint: disable=invalid-name,no-member
-    constant_time_compare = hmac.compare_digest
-else:
-    def constant_time_compare(actual, expected):
-        """Return whether or not two strings match.
-
-        The time taken is dependent on the number of characters provided
-        instead of the number of characters that match which makes this
-        function resistant to timing attacks.
-
-        """
-        actual_len = len(actual)
-        expected_len = len(expected)
-        result = actual_len ^ expected_len
-        if expected_len > 0:
-            for i in xrange(actual_len):
-                result |= ord(actual[i]) ^ ord(expected[i % expected_len])
-        return result == 0
-
-
-class SignatureError(Exception):
-    """Base class for all message signing related errors."""
-    pass
-
-
-class UnreadableSignatureError(SignatureError):
-    """Raised when the signature is corrupt or wrongly formatted."""
-    pass
-
-
-class IncorrectSignatureError(SignatureError):
-    """Raised when the signature is readable but does not match the message."""
-    pass
-
-
-class ExpiredSignatureError(SignatureError):
-    """Raised when the signature is valid but has expired.
-
-    The ``expiration`` attribute is the time (as seconds since the UNIX epoch)
-    at which the signature expired.
-
-    """
-    def __init__(self, expiration):
-        self.expiration = expiration
-        super(ExpiredSignatureError, self).__init__()
-
+from . errors import UnreadableSignatureError
+from . errors import IncorrectSignatureError, ExpiredSignatureError
+from . common import constant_time_compare
 
 # A signature is a base64 encoded binary blob, comprised of a header and
 # digest.
