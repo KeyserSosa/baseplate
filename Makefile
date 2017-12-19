@@ -30,10 +30,16 @@ docs:
 spelling:
 	sphinx-build -M spelling docs/ build/
 
-tests: thrift
+test2: thrift
 	nosetests -v
+
+test3: thrift
 	nosetests3 -v
+
+doctest: thrift
 	sphinx-build -M doctest docs/ build/
+
+tests: test2 test3 doctest
 
 lint:
 	flake8 baseplate/
