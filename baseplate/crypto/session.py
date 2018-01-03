@@ -47,23 +47,6 @@ class SessionTracker(EncryptedToken):
         else:
             return cls.create(secret)
 
-    @classmethod
-    def from_str(cls, secret, token_str):
-        try:
-            return cls.deserialize(secret, token_str)
-        except UnparseableTokenError:
-            # the token was completely unreadable
-            return
-        except CorruptTokenError:
-            # the token's encrypted blob was unreadable
-            return
-        except InvalidTokenError:
-            # the token's blob and plaintext did not match
-            return
-
-    def to_str(self):
-        return self.serialize()
-
     def to_event_payload(self):
         """Serialize SessionTracker for use in the event pipeline."""
         return self.to_dict(prefix="session")

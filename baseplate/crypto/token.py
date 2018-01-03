@@ -222,6 +222,23 @@ class EncryptedToken(object):
             data = {"_".join([prefix, k]): v for k, v in data.items()}
         return data
 
+    @classmethod
+    def from_str(cls, secret, token_str):
+        try:
+            return cls.deserialize(secret, token_str)
+        except UnparseableTokenError:
+            # the token was completely unreadable
+            return
+        except CorruptTokenError:
+            # the token's encrypted blob was unreadable
+            return
+        except InvalidTokenError:
+            # the token's blob and plaintext did not match
+            return
+
+    def to_str(self):
+        return self.serialize()
+
     def serialize_payload(self):
         return self.payload
 
